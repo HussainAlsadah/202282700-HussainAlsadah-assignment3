@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     themeButton.classList.add("theme-toggle-btn");
     document.body.appendChild(themeButton);
 
-    // Restore saved theme
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
         document.body.classList.add("dark-mode");
@@ -59,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile Nav Toggle
     // =============================
     const navToggle = document.getElementById('nav-toggle');
-    const navLinks = document.querySelector('.nav-links');
+    const navLinks  = document.querySelector('.nav-links');
 
     if (navToggle && navLinks) {
         navToggle.addEventListener('click', () => {
@@ -77,9 +76,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =============================
+    // Simulated Login / Logout State
+    // =============================
+    const loginBtn      = document.getElementById('login-btn');
+    const welcomeBanner = document.getElementById('welcome-banner');
+    const welcomeName   = document.getElementById('welcome-name');
+    const logoutBtn     = document.getElementById('logout-btn');
+    const loginModal    = document.getElementById('login-modal');
+    const modalName     = document.getElementById('modal-name');
+    const modalNameErr  = document.getElementById('modal-name-error');
+    const modalCancel   = document.getElementById('modal-cancel');
+    const modalConfirm  = document.getElementById('modal-confirm');
+
+    // Track login state in memory
+    let isLoggedIn = false;
+    let currentUser = '';
+
+    function openModal() {
+        modalName.value = '';
+        modalNameErr.textContent = '';
+        modalName.classList.remove('input-error');
+        loginModal.classList.remove('hidden');
+        setTimeout(() => modalName.focus(), 50);
+    }
+
+    function closeModal() {
+        loginModal.classList.add('hidden');
+    }
+
+    function doLogin(name) {
+        isLoggedIn = true;
+        currentUser = name;
+        welcomeName.textContent = name;
+        welcomeBanner.classList.remove('hidden');
+        loginBtn.textContent = 'Log Out';
+        loginBtn.classList.add('logged-in');
+        closeModal();
+    }
+
+    function doLogout() {
+        isLoggedIn = false;
+        currentUser = '';
+        welcomeBanner.classList.add('hidden');
+        loginBtn.textContent = 'Log In';
+        loginBtn.classList.remove('logged-in');
+    }
+
+    loginBtn.addEventListener('click', () => {
+        if (isLoggedIn) {
+            doLogout();
+        } else {
+            openModal();
+        }
+    });
+
+    logoutBtn.addEventListener('click', doLogout);
+
+    modalCancel.addEventListener('click', closeModal);
+
+    // Close modal when clicking the backdrop
+    loginModal.addEventListener('click', (e) => {
+        if (e.target === loginModal) closeModal();
+    });
+
+    // Confirm login on button click
+    modalConfirm.addEventListener('click', () => {
+        const name = modalName.value.trim();
+        if (!name) {
+            modalNameErr.textContent = 'Please enter your name.';
+            modalName.classList.add('input-error');
+            return;
+        }
+        doLogin(name);
+    });
+
+    // Also confirm on Enter key
+    modalName.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') modalConfirm.click();
+    });
+
+
+    // =============================
     // Tab Switching (About / Skills / Experience)
     // =============================
-    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabBtns   = document.querySelectorAll('.tab-btn');
     const tabPanels = document.querySelectorAll('.tab-panel');
 
     tabBtns.forEach(btn => {
@@ -95,9 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const target = document.getElementById(btn.dataset.tab);
             if (target) {
                 target.classList.add('active');
-                if (btn.dataset.tab === 'skills-tab') {
-                    animateSkillBars();
-                }
+                if (btn.dataset.tab === 'skills-tab') animateSkillBars();
             }
         });
     });
@@ -116,6 +194,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =============================
+    // Project Filter & Sort
+    // =============================
+    const filterBtns    = document.querySelectorAll('.filter-btn');
+    const sortSelect    = document.getElementById('sort-select');
+    const projectGrid   = document.getElementById('project-grid');
+    const noProjectsMsg = document.getElementById('no-projects-msg');
+
+    // Snapshot all cards and their data from the DOM
+    const allCards = Array.from(document.querySelectorAll('.project-card')).map(card => ({
+        el:       card,
+        category: card.dataset.category,
+        date:     parseInt(card.dataset.date, 10),
+        name:     card.dataset.name
+    }));
+
+    let activeFilter = 'all';
+    let activeSort   = 'default';
+
+    function applyFilterAndSort() {
+        // Step 1: filter by category
+        let visible = allCards.filter(c =>
+            activeFilter === 'all' || c.category === activeFilter
+        );
+
+        // Step 2: sort
+        if (activeSort === 'name-asc') {
+            visible.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (activeSort === 'name-desc') {
+            visible.sort((a, b) => b.name.localeCompare(a.name));
+        } else if (activeSort === 'date-desc') {
+            visible.sort((a, b) => b.date - a.date);
+        } else if (activeSort === 'date-asc') {
+            visible.sort((a, b) => a.date - b.date);
+        }
+
+        // Step 3: detach all cards, re-attach in new order
+        allCards.forEach(c => {
+            c.el.style.display = 'none';
+            if (projectGrid.contains(c.el)) projectGrid.removeChild(c.el);
+        });
+        visible.forEach(c => {
+            c.el.style.display = '';
+            projectGrid.appendChild(c.el);
+        });
+
+        // Step 4: empty state message
+        if (noProjectsMsg) {
+            noProjectsMsg.classList.toggle('hidden', visible.length > 0);
+        }
+    }
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = btn.dataset.filter;
+            applyFilterAndSort();
+        });
+    });
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            activeSort = sortSelect.value;
+            applyFilterAndSort();
+        });
+    }
+
+
+    // =============================
     // Tech Trivia — Open Trivia DB API
     // =============================
     const triviaLoading  = document.getElementById('trivia-loading');
@@ -128,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const triviaError    = document.getElementById('trivia-error');
 
     let triviaQueue = [];
-    let answered = false;
+    let answered    = false;
 
     function decodeHTML(str) {
         const txt = document.createElement('textarea');
@@ -213,6 +360,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     triviaNext.addEventListener('click', showNextQuestion);
     fetchTrivia();
+
+
+    // =============================
+    // Quote Widget — Quotable API
+    // =============================
+    const quoteLoading = document.getElementById('quote-loading');
+    const quoteBlock   = document.getElementById('quote-block');
+    const quoteText    = document.getElementById('quote-text');
+    const quoteAuthor  = document.getElementById('quote-author');
+    const quoteError   = document.getElementById('quote-error');
+    const quoteRefresh = document.getElementById('quote-refresh');
+
+    async function fetchQuote() {
+        // Show loading state
+        quoteBlock.classList.add('hidden');
+        quoteError.classList.add('hidden');
+        quoteLoading.classList.remove('hidden');
+        quoteRefresh.disabled = true;
+
+        try {
+            const res = await fetch('https://api.quotable.io/random?tags=technology|science|education');
+            if (!res.ok) throw new Error('Bad response');
+            const data = await res.json();
+
+            quoteText.textContent   = data.content;
+            quoteAuthor.textContent = '— ' + data.author;
+
+            quoteLoading.classList.add('hidden');
+            quoteBlock.classList.remove('hidden');
+        } catch (err) {
+            // Fallback: show a hardcoded quote if the API fails
+            const fallbacks = [
+                { content: "Any sufficiently advanced technology is indistinguishable from magic.", author: "Arthur C. Clarke" },
+                { content: "It's not a bug, it's an undocumented feature.", author: "Unknown" },
+                { content: "First, solve the problem. Then, write the code.", author: "John Johnson" },
+                { content: "Code is like humor. When you have to explain it, it's bad.", author: "Cory House" }
+            ];
+            const pick = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+            quoteText.textContent   = pick.content;
+            quoteAuthor.textContent = '— ' + pick.author;
+
+            quoteLoading.classList.add('hidden');
+            quoteBlock.classList.remove('hidden');
+        } finally {
+            quoteRefresh.disabled = false;
+        }
+    }
+
+    quoteRefresh.addEventListener('click', fetchQuote);
+    fetchQuote();
 
 
     // =============================
