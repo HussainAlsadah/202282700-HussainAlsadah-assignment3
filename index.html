@@ -23,8 +23,16 @@
                 <li><a href="#hobbies">Hobbies</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
+            <!-- Login / Logout button in navbar -->
+            <button id="login-btn" class="login-btn">Log In</button>
         </nav>
     </header>
+
+    <!-- Welcome Banner (shown when logged in) -->
+    <div id="welcome-banner" class="welcome-banner hidden">
+        👋 Welcome back, <strong id="welcome-name">Guest</strong>! You're viewing the portfolio as a logged-in user.
+        <button id="logout-btn" class="logout-inline-btn">Log out</button>
+    </div>
 
     <!-- About Section (Tabbed) -->
     <section id="about" class="section">
@@ -104,11 +112,32 @@
         <div class="container">
             <h2>Projects</h2>
 
-            <div class="project-grid">
+            <!-- Filter & Sort Controls -->
+            <div class="project-controls">
+                <div class="filter-group">
+                    <span class="controls-label">Filter:</span>
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="AI">AI</button>
+                    <button class="filter-btn" data-filter="JS">JS</button>
+                    <button class="filter-btn" data-filter="Web">Web</button>
+                </div>
+                <div class="sort-group">
+                    <span class="controls-label">Sort:</span>
+                    <select id="sort-select" aria-label="Sort projects">
+                        <option value="default">Default</option>
+                        <option value="name-asc">Name (A–Z)</option>
+                        <option value="name-desc">Name (Z–A)</option>
+                        <option value="date-desc">Newest First</option>
+                        <option value="date-asc">Oldest First</option>
+                    </select>
+                </div>
+            </div>
 
-                <div class="project-card">
+            <div class="project-grid" id="project-grid">
+
+                <div class="project-card" data-category="AI" data-date="2024" data-name="AI Study Assistant">
                     <div class="project-media">
-                        <img src="assets/images/AI-ProjectPlaceHolder.png" alt="AI Study Assistant preview">
+                        <img src="assets/images/AI-ProjectPlaceHolder.png" alt="AI Study Assistant preview" loading="lazy">
                         <span class="project-badge">AI</span>
                     </div>
                     <h3>AI Study Assistant</h3>
@@ -118,9 +147,9 @@
                     </p>
                 </div>
 
-                <div class="project-card">
+                <div class="project-card" data-category="JS" data-date="2024" data-name="Task Manager App">
                     <div class="project-media">
-                        <img src="assets/images/task-manager-placeholder.png" alt="Task Manager preview">
+                        <img src="assets/images/task-manager-placeholder.png" alt="Task Manager preview" loading="lazy">
                         <span class="project-badge">JS</span>
                     </div>
                     <h3>Task Manager App</h3>
@@ -130,7 +159,21 @@
                     </p>
                 </div>
 
+                <div class="project-card" data-category="Web" data-date="2023" data-name="Portfolio Website">
+                    <div class="project-media">
+                        <img src="assets/images/computer-stuff.jpg" alt="Portfolio website preview" loading="lazy">
+                        <span class="project-badge">Web</span>
+                    </div>
+                    <h3>Portfolio Website</h3>
+                    <p>
+                        This personal portfolio site built from scratch with HTML, CSS, and vanilla JavaScript,
+                        featuring dark mode, API integration, and a responsive layout.
+                    </p>
+                </div>
+
             </div>
+
+            <p id="no-projects-msg" class="no-projects-msg hidden">No projects match the selected filter.</p>
         </div>
     </section>
 
@@ -171,6 +214,20 @@
                 </div>
             </div>
 
+            <!-- Quote Widget -->
+            <div class="quote-widget">
+                <h3 class="quote-title">💡 Quote of the Moment</h3>
+                <div id="quote-content">
+                    <p id="quote-loading">Loading quote...</p>
+                    <div id="quote-block" class="hidden">
+                        <p id="quote-text" class="quote-text"></p>
+                        <p id="quote-author" class="quote-author"></p>
+                    </div>
+                    <p id="quote-error" class="quote-error hidden">⚠️ Couldn't load quote. Check your connection.</p>
+                </div>
+                <button id="quote-refresh" class="quote-refresh-btn">New Quote ↻</button>
+            </div>
+
         </div>
     </section>
 
@@ -203,6 +260,22 @@
     <footer>
         <p>© 2026 Hussain Alsadah | 202282700 | Software Engineering Student</p>
     </footer>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal">
+            <h3 id="modal-title">Log In</h3>
+            <p class="modal-subtitle">Enter your name to continue as a guest visitor.</p>
+            <div class="modal-field">
+                <input type="text" id="modal-name" placeholder="Your name" maxlength="40" autocomplete="off">
+                <span class="field-error" id="modal-name-error"></span>
+            </div>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="modal-cancel-btn">Cancel</button>
+                <button id="modal-confirm" class="modal-confirm-btn">Log In</button>
+            </div>
+        </div>
+    </div>
 
     <script src="js/script.js"></script>
 </body>
