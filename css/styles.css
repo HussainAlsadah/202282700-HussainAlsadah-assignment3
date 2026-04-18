@@ -34,6 +34,23 @@ h2 {
 .hidden { display: none !important; }
 
 /* =============================
+   Visitor Timer Bar
+   ============================= */
+.timer-bar {
+    background: #eef4fb;
+    border-bottom: 1px solid #d0e4f5;
+    color: #546e7a;
+    text-align: center;
+    padding: 7px 20px;
+    font-size: 0.85em;
+}
+
+.timer-bar strong {
+    color: #1a3a52;
+    font-weight: 700;
+}
+
+/* =============================
    Section backgrounds (alternating)
    ============================= */
 #about       { background: linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%); }
@@ -831,6 +848,14 @@ footer {
 .dark-mode #interactive {
     background: linear-gradient(135deg, #141c28 0%, #1a2538 100%) !important;
 }
+
+/* Timer bar dark */
+.dark-mode .timer-bar {
+    background: #0d1a26;
+    border-bottom-color: #1e3a50;
+    color: #5a7a95;
+}
+.dark-mode .timer-bar strong { color: #64b5f6; }
 
 /* Welcome banner dark */
 .dark-mode .welcome-banner {

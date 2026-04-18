@@ -66,6 +66,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // =============================
+    // Visitor Timer
+    // =============================
+    const visitTimerEl = document.getElementById('visit-timer');
+    let secondsOnPage = 0;
+
+    function formatTime(s) {
+        if (s < 60) return s + 's';
+        const m = Math.floor(s / 60);
+        const sec = s % 60;
+        return m + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
+    }
+
+    setInterval(() => {
+        secondsOnPage++;
+        if (visitTimerEl) visitTimerEl.textContent = formatTime(secondsOnPage);
+    }, 1000);
+
+
+    // =============================
     // Login / Logout — with localStorage persistence
     // =============================
     const loginBtn      = document.getElementById('login-btn');
