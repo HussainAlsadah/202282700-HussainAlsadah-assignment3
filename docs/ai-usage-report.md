@@ -35,6 +35,7 @@ Learning Outcomes
 - Understood the value of async/await with try/catch/finally for API calls, particularly using finally to re-enable UI elements regardless of whether a request succeeded or failed.
 - Reinforced that AI-generated code always requires testing — features that look correct in isolation can break when combined with existing code.
 
+
 Responsible Use & Modifications
 -------------------------------
 I have manually reviewed AI-generated content as follows:
